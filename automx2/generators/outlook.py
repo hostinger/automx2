@@ -31,6 +31,7 @@ from automx2.model import Domain
 from automx2.model import Server
 
 NS_AUTODISCOVER = 'http://schemas.microsoft.com/exchange/autodiscover/outlook/requestschema/2006'
+NS_AUTODISCOVER_RESPONSE = 'http://schemas.microsoft.com/exchange/autodiscover/responseschema/2006'
 NS_RESPONSE = 'http://schemas.microsoft.com/exchange/autodiscover/outlook/responseschema/2006a'
 
 TYPE_MAP = {
@@ -67,7 +68,7 @@ class OutlookGenerator(ConfigGenerator):
 
     def client_config(self, local_part, domain_part: str, display_name: str) -> str:
         domain: Domain = Domain.query.filter_by(name=domain_part).first()
-        root_element = Element('Autodiscover', attrib={'xmlns': NS_AUTODISCOVER})
+        root_element = Element('Autodiscover', attrib={'xmlns': NS_AUTODISCOVER_RESPONSE})
         response = SubElement(root_element, 'Response', attrib={'xmlns': NS_RESPONSE})
         if not domain:
             raise DomainNotFound(f'Domain "{domain_part}" not found')
