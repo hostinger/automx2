@@ -30,7 +30,7 @@ from automx2.ldap import STATUS_SUCCESS
 from automx2.model import Domain
 from automx2.model import Server
 
-NS_AUTODISCOVER = 'http://schemas.microsoft.com/exchange/autodiscover/outlook/requestschema/2006'
+NS_AUTODISCOVER_REQUEST = 'http://schemas.microsoft.com/exchange/autodiscover/outlook/requestschema/2006'
 NS_AUTODISCOVER_RESPONSE = 'http://schemas.microsoft.com/exchange/autodiscover/responseschema/2006'
 NS_RESPONSE = 'http://schemas.microsoft.com/exchange/autodiscover/outlook/responseschema/2006a'
 
