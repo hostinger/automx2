@@ -30,6 +30,9 @@ CONF_DB_ECHO = 'db_echo'
 CONF_DB_URI = 'db_uri'
 CONF_LOGLEVEL = 'loglevel'
 CONF_PROXY_COUNT = 'proxy_count'
+CONF_MOBILECONFIG_SIGN_CERT = 'mobileconfig_cert'
+CONF_MOBILECONFIG_SIGN_KEY = 'mobileconfig_key'
+CONF_MOBILECONFIG_SIGN_CA = 'mobileconfig_ca'
 
 # Default values will be overridden by user-defined values.
 _DEFAULT_CONF = {
@@ -38,6 +41,9 @@ _DEFAULT_CONF = {
         CONF_DB_URI: 'sqlite:///:memory:',
         CONF_LOGLEVEL: 'WARNING',
         CONF_PROXY_COUNT: 0,
+        CONF_MOBILECONFIG_SIGN_CERT: '',
+        CONF_MOBILECONFIG_SIGN_KEY: '',
+        CONF_MOBILECONFIG_SIGN_CA: '',
     }
 }
 
@@ -91,6 +97,15 @@ class Config:
 
     def proxy_count(self) -> int:
         return self.get_int(CONF_PROXY_COUNT)
+
+    def mobileconfig_cert(self) -> str:
+        return self.get(CONF_MOBILECONFIG_SIGN_CERT)
+
+    def mobileconfig_key(self) -> str:
+        return self.get(CONF_MOBILECONFIG_SIGN_KEY)
+
+    def mobileconfig_ca(self) -> str:
+        return self.get(CONF_MOBILECONFIG_SIGN_CA)
 
 
 config = Config()

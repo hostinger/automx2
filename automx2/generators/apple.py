@@ -36,6 +36,11 @@ from automx2.model import Provider
 from automx2.model import Server
 from automx2.util import expand_placeholders
 from automx2.util import unique
+from automx2.config import config
+
+from cryptography import x509
+from cryptography.hazmat.primitives import serialization, hashes
+from cryptography.hazmat.primitives.serialization import pkcs7
 
 AUTH_MAP = {
     'none': 'EmailAuthNone',
@@ -156,6 +161,26 @@ def _map_authentication(server: Server) -> str:
         return AUTH_MAP[server.authentication]
     raise InvalidAuthenticationType(f'Invalid authentication type "{server.authentication}"')
 
+def sign_data(data: str) -> str:
+    with open(config.mobileconfig_key(), "rb") as private_key_file:
+        private_key = serialization.load_pem_private_key(private_key_file.read(), password=None, backend=None)
+
+    with open(config.mobileconfig_cert(), "rb") as public_cert_file:
+        public_cert = x509.load_pem_x509_certificate(public_cert_file.read())
+
+    with open(config.mobileconfig_ca(), "rb") as public_ca_file:
+        ca_cert = x509.load_pem_x509_certificate(public_ca_file.read())
+
+    return pkcs7.PKCS7SignatureBuilder().set_data(
+        data
+    ).add_signer(
+        public_cert, private_key, hashes.SHA256()
+    ).add_certificate(
+        ca_cert
+    ).sign(
+        serialization.Encoding.DER, []
+    )
+
 
 class AppleGenerator(ConfigGenerator):
     def client_config(self, local_part: str, domain_part: str, display_name: str) -> str:
@@ -185,4 +210,8 @@ class AppleGenerator(ConfigGenerator):
         inner['EmailAccountName'] = lookup_result.cn
         _sanitise(outer, local_part, domain_part)
         _subtree(root_element, '', outer)
+
+        if config.mobileconfig_cert() and config.mobileconfig_key() and config.mobileconfig_ca():
+            return sign_data(xml_to_string(root_element))
+
         return xml_to_string(root_element)
