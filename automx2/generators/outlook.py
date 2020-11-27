@@ -64,7 +64,10 @@ class OutlookGenerator(ConfigGenerator):
         SubElement(element, 'Server').text = server.name
         SubElement(element, 'Port').text = str(server.port)
         SubElement(element, 'LoginName').text = self.pick_one(server.user_name, override_uid)
-        SubElement(element, 'SSL').text = self.on_off('SSL' == server.socket_type)
+        if 'STARTTLS' == server.socket_type:
+            SubElement(element, 'Encryption').text = 'tls'
+        else:
+            SubElement(element, 'SSL').text = self.on_off('SSL' == server.socket_type)
         SubElement(element, 'AuthRequired').text = self.on_off(True)
 
     @staticmethod
