@@ -29,6 +29,7 @@ from automx2.ldap import LookupResult
 from automx2.ldap import STATUS_SUCCESS
 from automx2.model import Domain
 from automx2.model import Server
+from automx2.util import expand_placeholders
 
 NS_AUTODISCOVER_REQUEST = 'http://schemas.microsoft.com/exchange/autodiscover/outlook/requestschema/2006'
 NS_AUTODISCOVER_RESPONSE = 'http://schemas.microsoft.com/exchange/autodiscover/responseschema/2006'
@@ -51,6 +52,11 @@ class OutlookGenerator(ConfigGenerator):
         if condition:
             return 'on'
         return 'off'
+
+    def _sanitise(self, xml: Element, local_part, domain_part: str) -> None:
+        for element in xml.iter():
+            if element.text is not None:
+                element.text = expand_placeholders(element.text, local_part, domain_part)
 
     def protocol_element(self, parent: Element, server: Server, override_uid: str = None) -> None:
         element = SubElement(parent, 'Protocol')
@@ -85,4 +91,5 @@ class OutlookGenerator(ConfigGenerator):
             if server.type not in TYPE_MAP:
                 raise InvalidServerType(f'Invalid server type "{server.type}"')
             self.protocol_element(account, server, lookup_result.uid)
+        self._sanitise(root_element, local_part, domain_part)
         return xml_to_string(root_element)
