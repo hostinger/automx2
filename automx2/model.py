@@ -75,7 +75,7 @@ class Server(db.Model):
     socket_type = db.Column(db.String, nullable=False, default='STARTTLS')
     user_name = db.Column(db.String, nullable=False, default=PLACEHOLDER_ADDRESS)
     authentication = db.Column(db.String, nullable=False, default='plain')
-    domains = db.relationship('Domain', secondary=server_domain_map, lazy='subquery',
+    domains = db.relationship('Domain', secondary=server_domain_map, lazy='select',
                               backref=db.backref('servers', lazy='select'))
 
     def __repr__(self) -> str:
