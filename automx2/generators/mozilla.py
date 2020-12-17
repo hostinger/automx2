@@ -63,8 +63,7 @@ class MozillaGenerator(ConfigGenerator):
             raise NoProviderForDomain(f'No provider for domain "{domain_part}"')
         provider_element = SubElement(root_element, 'emailProvider', attrib={'id': branded_id(provider.id)})
         SubElement(provider_element, 'identity')  # Deliberately left empty
-        for provider_domain in provider.domains:
-            SubElement(provider_element, 'domain').text = provider_domain.name
+        SubElement(provider_element, 'domain').text = domain.name
         SubElement(provider_element, 'displayName').text = provider.name
         SubElement(provider_element, 'displayShortName').text = provider.short_name
         for server in domain.servers:
