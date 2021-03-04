@@ -38,8 +38,16 @@ class MailConfig:
         data = self.config_response(local_part, domain_part, realname, password)
         return self.response_with_type(data)
 
+#    def config_redirect_from_address(self, address: str, realname: str = '', password: str = '') -> Response:
+#        local_part, domain_part = parse_email_address(address)
+#        data = self.config_response_redirect(local_part, domain_part, realname, password)
+#        return self.response_with_type(data)
+
     def config_response(self, local_part, domain_part: str, realname: str, password: str) -> str:
         raise NotImplementedError
+
+#    def config_response_redirect(self, local_part, domain_part: str, realname: str, password: str) -> str:
+#        raise NotImplementedError
 
     @staticmethod
     def response_type() -> str:

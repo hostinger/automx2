@@ -31,8 +31,16 @@ from automx2.model import Domain
 from automx2.model import Server
 from automx2.util import expand_placeholders
 
-NS_AUTODISCOVER_REQUEST = 'http://schemas.microsoft.com/exchange/autodiscover/outlook/requestschema/2006'
-NS_AUTODISCOVER_RESPONSE = 'http://schemas.microsoft.com/exchange/autodiscover/responseschema/2006'
+NS_AUTODISCOVER_NAMESPACE = {
+    'activesync': 'http://schemas.microsoft.com/exchange/autodiscover/outlook/requestschema/2006',
+    'exchange': 'http://schemas.microsoft.com/exchange/autodiscover/outlook/requestschema/2006'
+}
+
+NS_AUTODISCOVER_RESPONSE = {
+    'activesync': 'http://schemas.microsoft.com/exchange/autodiscover/mobilesync/responseschema/2006',
+    'exchange': 'http://schemas.microsoft.com/exchange/autodiscover/responseschema/2006'
+}
+
 NS_RESPONSE = 'http://schemas.microsoft.com/exchange/autodiscover/outlook/responseschema/2006a'
 
 TYPE_MAP = {
@@ -64,6 +72,7 @@ class OutlookGenerator(ConfigGenerator):
         SubElement(element, 'Server').text = server.name
         SubElement(element, 'Port').text = str(server.port)
         SubElement(element, 'LoginName').text = self.pick_one(server.user_name, override_uid)
+        SubElement(element, 'SPA').text = 'off'
         if 'STARTTLS' == server.socket_type:
             SubElement(element, 'Encryption').text = 'tls'
         else:
@@ -77,7 +86,7 @@ class OutlookGenerator(ConfigGenerator):
 
     def client_config(self, local_part, domain_part: str, display_name: str) -> str:
         domain: Domain = Domain.query.filter_by(name=domain_part).first()
-        root_element = Element('Autodiscover', attrib={'xmlns': NS_AUTODISCOVER_RESPONSE})
+        root_element = Element('Autodiscover', attrib={'xmlns': NS_AUTODISCOVER_RESPONSE['exchange']})
         response = SubElement(root_element, 'Response', attrib={'xmlns': NS_RESPONSE})
         if not domain:
             raise DomainNotFound(f'Domain "{domain_part}" not found')
@@ -96,3 +105,21 @@ class OutlookGenerator(ConfigGenerator):
             self.protocol_element(account, server, lookup_result.uid)
         self._sanitise(root_element, local_part, domain_part)
         return xml_to_string(root_element)
+
+#    def client_config_redirect(self, local_part, domain_part: str, display_name: str) -> str:
+#        domain: Domain = Domain.query.filter_by(name=domain_part).first()
+#        root_element = Element('Autodiscover', attrib={'xmlns': NS_AUTODISCOVER_RESPONSE['activesync']})
+#        response = SubElement(root_element, 'Response', attrib={'xmlns': NS_AUTODISCOVER_RESPONSE['exchange'] })
+#        if not domain:
+#            raise DomainNotFound(f'Domain "{domain_part}" not found')
+#        SubElement(response, 'Culture').text = 'en:en'
+#        user = SubElement(response, 'User')
+#        SubElement(user, 'DisplayName').text = display_name
+#        SubElement(user, 'EMailAddress').text = f'{local_part}@{domain_part}'
+#        action = SubElement(response, 'Action')
+#        settings = SubElement(action, 'Settings')
+#        server = SubElement(settings, 'Server')
+#        SubElement(server,'Type').text = 'MobileSync'
+#        SubElement(server,'Url').text = ''
+#        SubElement(server,'Name').text = ''
+#        return xml_to_string(root_element)

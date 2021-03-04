@@ -28,7 +28,7 @@ from flask.views import MethodView
 from automx2 import AutomxException
 from automx2 import NotFoundException
 from automx2 import log
-from automx2.generators.outlook import NS_AUTODISCOVER_REQUEST
+from automx2.generators.outlook import NS_AUTODISCOVER_NAMESPACE
 from automx2.generators.outlook import OutlookGenerator
 from automx2.views import CONTENT_TYPE_XML
 from automx2.views import EMAIL_OUTLOOK
@@ -45,8 +45,16 @@ class OutlookView(MailConfig, MethodView):
             log.error(message)
             return message, 400
         element: Element = fromstring(str(request.data, encoding='utf-8', errors='strict'))
-        ns = {'n': NS_AUTODISCOVER_REQUEST}
-        element = element.find(f'n:Request/n:{EMAIL_OUTLOOK}', ns)
+#        element_activesync = element.find(f'activesync:Request/activesync:{EMAIL_OUTLOOK}', NS_AUTODISCOVER_NAMESPACE)
+        element = element.find(f'exchange:Request/exchange:{EMAIL_OUTLOOK}', NS_AUTODISCOVER_NAMESPACE)
+#        if element_activesync is not None:
+#            try:
+#                return self.config_redirect_from_address(element_activesync.text)
+#            except NotFoundException:
+#                return '', 204
+#            except AutomxException as e:
+#                log.exception(e)
+#                abort(400)
         if element is None:
             message = f'Missing request argument "{EMAIL_OUTLOOK}"'
             log.error(message)
@@ -62,3 +70,7 @@ class OutlookView(MailConfig, MethodView):
     def config_response(self, local_part, domain_part: str, realname: str, password: str) -> str:
         data = OutlookGenerator().client_config(local_part, domain_part, realname)
         return data
+
+#    def config_response_redirect(self, local_part, domain_part: str, realname: str, password: str) -> str:
+#        data = OutlookGenerator().client_config_redirect(local_part, domain_part, realname)
+#        return data

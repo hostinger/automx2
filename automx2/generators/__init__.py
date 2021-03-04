@@ -43,6 +43,9 @@ class ConfigGenerator:
     def client_config(self, local_part: str, domain_part: str, display_name: str) -> str:
         raise NotImplementedError
 
+#    def client_config_redirect(self, local_part: str, domain_part: str, display_name: str) -> str:
+#        raise NotImplementedError
+
     @staticmethod
     def ldap_lookup(email_address: str, server: Ldapserver) -> LookupResult:
         if not (server and server.name):
