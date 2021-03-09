@@ -26,6 +26,7 @@ from automx2.config import config
 from automx2.model import db
 from automx2.views import autoconfig
 from automx2.views import autodiscover
+from automx2.views import autodiscoverv2
 from automx2.views import mobileconfig
 from automx2.views.database import InitDatabase
 from automx2.views.site import SiteRoot
@@ -33,6 +34,7 @@ from automx2.views.site import SiteRoot
 APPLE_CONFIG_ROUTE = '/mobileconfig/'
 MOZILLA_CONFIG_ROUTE = '/mail/config-v1.1.xml'
 MSOFT_CONFIG_ROUTE = '/autodiscover/autodiscover.xml'
+MSOFTV2_CONFIG_ROUTE = '/autodiscover/autodiscover.json'
 
 
 def _proxy_fix():
@@ -54,6 +56,7 @@ app.add_url_rule('/initdb/', view_func=InitDatabase.as_view('initdb'), methods=[
 app.add_url_rule(APPLE_CONFIG_ROUTE, view_func=mobileconfig.AppleView.as_view('apple'), methods=['GET'])
 app.add_url_rule(MOZILLA_CONFIG_ROUTE, view_func=autoconfig.MozillaView.as_view('mozilla'), methods=['GET'])
 app.add_url_rule(MSOFT_CONFIG_ROUTE, view_func=autodiscover.OutlookView.as_view('msoft'), methods=['POST'])
+app.add_url_rule(MSOFTV2_CONFIG_ROUTE, view_func=autodiscoverv2.OutlookView.as_view('msoftv2'), methods=['GET'])
 _proxy_fix()
 
 db.init_app(app)

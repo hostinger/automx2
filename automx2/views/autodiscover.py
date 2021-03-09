@@ -49,8 +49,7 @@ class OutlookView(MailConfig, MethodView):
         element = element.find(f'n:Request/n:{EMAIL_OUTLOOK}', ns)
         if element is None:
             message = f'Missing request argument "{EMAIL_OUTLOOK}"'
-            log.error(message)
-            return message, 400
+            return message, 401
         try:
             return self.config_from_address(element.text)
         except NotFoundException:
